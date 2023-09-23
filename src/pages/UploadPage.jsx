@@ -62,7 +62,7 @@ export const UploadPage = () => {
         const data = await axios.post("http://localhost:8000/api/upload/", formData).then(async (data) => {
 
 
-            navigate("analyze",{state:data.data});
+            navigate("/analyze",{state:data.data});
 
 
         });

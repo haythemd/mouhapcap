@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {useLocation} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {
     Button,
     Collapse,
@@ -13,7 +13,7 @@ import {
 import {ExpandLess, ExpandMore, StarBorder} from "@mui/icons-material";
 export const AnalyzePage = () => {
 
-
+    const navigate = useNavigate();
     const { state } = useLocation();
     const list = state.map((e)=>false)
     const [buttonsMap, setButtonsMap] = useState(list);
@@ -35,18 +35,22 @@ console.log(state)
     //     console.log(buttonsMap)
     // })
 
-    const handleFilter = async () => {
-
-    if (destination==null) {
-        const list = packetsList.filter((e) => (e.sip_info.src_ip == source))
-        await setPacketsList(list);
-    }
-    else {
-         const list = packetsList.filter((e) => (e.sip_info.src_ip == source && e.sip_info.dst_ip == destination))
-        await setPacketsList(list);
-    }
-
+ const handleFilter = () => {
+  if (destination != "" && source != "") {
+    const list = packetsList.filter((e) => e.sip_info.from.includes(source) && e.sip_info.to.includes(destination));
+    setPacketsList(list);
+  }
 }
+
+
+
+const handleNav = ()=>{
+
+
+        navigate("/graph",{state:packetsList, replace:true})
+
+    }
+
 
 
   const handleClick = (i) => {
@@ -72,6 +76,7 @@ console.log(state)
                 <Button onClick={handleFilter} variant="outlined"> Filter</Button>
             </div>
             <br/>
+            {source!=""?<Button onClick={handleNav}> Trace Graph</Button>:<div></div>}
             <br/><br/><br/>
 
 <List

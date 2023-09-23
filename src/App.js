@@ -15,8 +15,8 @@ function App() {
 
       <Routes>
         <Route path="/" element={<UploadPage />} />
-          <Route path="analyze" element={<AnalyzePage/>} render={(props) => <AnalyzePage {...props}/>}/>
-        <Route path="graph" element={<GraphPage />} />
+          <Route path="/analyze" element={<AnalyzePage/>} render={(props) => <AnalyzePage {...props}/>}/>
+        <Route path="/graph" element={<GraphPage />} />
       </Routes>
     </div>
   );

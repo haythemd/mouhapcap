@@ -1,11 +1,24 @@
 import {useLocation} from "react-router-dom";
-import {Button, List} from "@mui/material";
-import {ArrowBackSharp, ArrowLeft, ArrowLeftSharp, ArrowRight, ArrowRightSharp} from "@mui/icons-material";
+import {
+    Button, Collapse,
+    Divider,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    ListSubheader
+} from "@mui/material";
 import {useEffect, useState} from "react";
+import { usePDF } from 'react-to-pdf';
+import dayjs from "dayjs";
+import {ExpandLess, ExpandMore} from "@mui/icons-material";
+
 
 export const GraphPage = () => {
 
 
+    const { toPDF, targetRef } = usePDF({filename: 'page.pdf'});
 
     const { state } = useLocation();
 
@@ -16,6 +29,13 @@ export const GraphPage = () => {
 
     const [selectedList, setSelectedList] = useState([])
 
+    const [pdfGenerated, setPdfGenerated] = useState(false);
+
+    const list = state.map((e)=>false);
+
+    const [buttonsMap, setButtonsMap] = useState(list);
+
+    const [open, setOpen] = useState(true);
 
 const filterList = ()=>{
 
@@ -39,6 +59,12 @@ const filterList = ()=>{
 }
 useEffect(filterList,[])
 
+const handlePDFClick = ()=>{
+
+        setPdfGenerated(true)
+    toPDF();
+
+    }
 
 
 const handleClick =(i)=>{
@@ -55,43 +81,149 @@ const handleClick =(i)=>{
 
     console.log(selectedList)
 }
+  const handleExpand = (i) => {
+
+        const list = buttonsMap
+        list.fill(false);
+        list[i]=true;
+        setButtonsMap(list);
+        setOpen(!open)
+        console.log(buttonsMap)
+  };
+
+
+
+
     return (
         <div >
+            <Divider style={{width:"100%", color:"black", borderTopWidth: 5}}></Divider>
+            <br/>
 
-            <List >
-                {idList.map((e,index)=><Button onClick={()=>handleClick(index)}>{e}</Button>)}
+            <List dense={false} style={{ maxHeight: 260, overflow: 'auto', marginTop:-80}}>
+                <ListSubheader style={{ fontWeight:"bold"}}>Call IDs</ListSubheader>
+
+                {idList.map((e,index)=><ListItem >
+                    <ListItemText style={{width:"20px"}}>{index}</ListItemText>
+                    <ListItemButton style={{backgroundColor:"black", color:"whitesmoke"}} divider={true} onClick={()=>handleClick(index)}>{e.trim()}</ListItemButton>
+                    <ListItemText></ListItemText>
+                </ListItem>)}
             </List>
+<Divider style={{width:"100%", height:"5px", color:"black", borderBottomWidth: 5}}></Divider>
+            <br/><br/><br/>
 
-            <div style={{width:"50%", display:"flex", flexDirection:"row", justifyContent:"space-evenly", alignItems:"center", alignContent:"center"}}>
-                <div>Source</div>
-                <div>Method</div>
-                <div>Destination</div>
-            </div>
-            {graphShown?<div >
+            <Button variant={"contained"} style={{backgroundColor:"black"}} onClick={handlePDFClick}>Generate PDF</Button>
+
+
+            <br/><br/>
+
+            {graphShown?
+                <div ref={targetRef} style={{flexDirection:"column",display:"flex",justifyContent:"space-evenly", alignContent:"space-evenly"}}><div style={{width:"150px"}}></div>
+
+
+                    <List style={{width:"80%",backgroundColor:'grey', alignSelf:"center"}} >
+                    <ListSubheader >
+                <div style={{display: "flex", backgroundColor:'grey',
+                    fontWeight:"bold",
+                        marginLeft:"-90px",
+                        flexDirection: "row",
+                        justifyContent: "space-around",
+                        alignItems: "center",
+                        alignContent: "center"}}>
+                    <ListItemText style={{fontWeight:"bold",}}>
+                        Source
+                    </ListItemText>
+                    <ListItemText style={{fontWeight:"bold",}}>
+                        Method
+                    </ListItemText>
+                    <ListItemText style={{fontWeight:"bold",}}>
+                        Destination
+                    </ListItemText>
+                    <div style={{width:"180px"}}></div>
+
+                </div>
+                    </ListSubheader>
+
+
 
                 {selectedList.map((e,index)=> {
 
                     console.log(e)
 
-                  return  <div style={{
-                        width: "50%",
+                  return  <ListItem style={{
+                        width: "100%",
                         display: "flex",
                         flexDirection: "row",
-                        justifyContent: "space-evenly",
+                        justifyContent: "space-around",
                         alignItems: "center",
-                        alignContent: "center"
+                        alignContent: "center",
+                      height:"100px"
                     }}>
 
-                        <div style={{height:"60px"}}>{e.sip_info.src_ip === selectedList[0].sip_info.src_ip ? e.sip_info.src_ip : e.sip_info.dst_ip}</div>
-                       <div style={{display:"flex", flexDirection:"column"}}>
-                           <div>{e.sip_info.method}</div>
+                        <ListItemText style={{height:"60px"}}>{e.sip_info.src_ip === selectedList[0].sip_info.src_ip ? e.sip_info.src_ip : e.sip_info.dst_ip}</ListItemText>
+                       <ListItemIcon style={{display:"flex", flexDirection:"column", justifyContent:"space-between"}}>
+                           <div style={{marginTop:"-20px",marginBottom:"18px", fontWeight:"bold"}}>{e.sip_info.headers.trim().split('\r\n')[0].split(":")[0]}</div>
+
+
+
                            {e.sip_info.src_ip == selectedList[0].sip_info.src_ip ?
-                            <ArrowRight style={{height:"60px",width:"200px"}} width={200}></ArrowRight> :
-                            <ArrowLeft style={{height:"60px"}} width={200}></ArrowLeft>}</div>
-                        <div style={{height:"60px"}}>{e.sip_info.src_ip == selectedList[0].sip_info.src_ip ? e.sip_info.dst_ip : e.sip_info.src_ip}</div>
+                            <svg style={{marginTop:"-28px", width:"100px" }} clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m13.022 14.999v3.251c0 .412.335.75.752.75.188 0 .375-.071.518-.206 1.775-1.685 4.945-4.692 6.396-6.069.2-.189.312-.452.312-.725 0-.274-.112-.536-.312-.725-1.451-1.377-4.621-4.385-6.396-6.068-.143-.136-.33-.207-.518-.207-.417 0-.752.337-.752.75v3.251h-9.02c-.531 0-1.002.47-1.002 1v3.998c0 .53.471 1 1.002 1z" fill-rule="nonzero"/></svg> :
+                            <svg style={{marginTop:"-28px", width:"100px", aspectRatio:3}} clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m10.978 14.999v3.251c0 .412-.335.75-.752.75-.188 0-.375-.071-.518-.206-1.775-1.685-4.945-4.692-6.396-6.069-.2-.189-.312-.452-.312-.725 0-.274.112-.536.312-.725 1.451-1.377 4.621-4.385 6.396-6.068.143-.136.33-.207.518-.207.417 0 .752.337.752.75v3.251h9.02c.531 0 1.002.47 1.002 1v3.998c0 .53-.471 1-1.002 1z" fill-rule="nonzero"/></svg>
+
+
+                           }</ListItemIcon>
+                      <ListItemText>{"                      "}</ListItemText>
+                        <ListItemText style={{height:"60px"}}>{e.sip_info.src_ip == selectedList[0].sip_info.src_ip ? e.sip_info.dst_ip : e.sip_info.src_ip}</ListItemText>
+                    </ListItem>
+                })} </List>
+                    <div style={{width:"100%", flex:1}}>
+
+                        <List dense={true}>
+                              {selectedList.map((e, index)=><div><ListItemButton dense={true} key={index} divider={true} sx={{display:"inline-flex",flexDirection:"row",justifyContent:"space-evenly"}} style={{display:"flex",flexDirection:"row",justifyContent:"space-evenly", backgroundColor:"grey"}} onClick={()=>handleExpand(index)}>
+        <ListItemText >{index}</ListItemText>
+     <ListItemText style={{fontWeight:"bold",color:"whitesmoke", backgroundColor:"black", width:"40px"}}>{dayjs.unix(e.sip_info.time).format('DD/MM/YYYY HH:mm:ss')}</ListItemText>
+        <ListItemText>{e.sip_info.src_ip.trim()}</ListItemText>
+      <ListItemText>{e.sip_info.dst_ip.trim()}</ListItemText>
+         <ListItemText>SIP/SDP</ListItemText>
+          <ListItemText>{e.sip_info.body.length}</ListItemText>
+                  <ListItemText>seq_number</ListItemText>
+
+         <ListItemText>{e.sip_info.summary.split(",")[0]}</ListItemText>
+
+         {buttonsMap[index] && open ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+    <Collapse in={true} timeout="auto" children={
+
+        <List component="div" disablePadding style={{backgroundColor:"white"}}>
+        <div style={{marginTop:"30px",marginBottom:"30px",display:"flex",flexDirection:"row"}}>
+            <div style={{marginLeft:"30px", color:"red", fontWeight:"bold"}}>Request-Line:  </div>{e.sip_info.summary.split(',').map((e)=><div style={{marginLeft:"30px"}}>{e}</div>)}
+        </div>
+
+            <div style={{marginTop:"30px",marginBottom:"30px",display:"flex",flexDirection:"column", overflow:"", justifyContent:"start", alignItems:"start"}}>
+                <div style={{ fontWeight:"bold",marginLeft:"30px", marginBottom:"20px", color:"red"}}>Message-Header:  </div>
+
+
+
+                {e.sip_info.headers.split('\r\n').map( (e)=>
+                    <div style={{display:"flex",flexDirection:"row", justifyContent:"space-around"}}><div style={{fontWeight:"bold",color:"black", marginLeft:"30px"}}>{e.split(":")[0]}</div><div style={{marginLeft:"30px"}}>{e.split(":")[1]}</div></div>)}
+            </div>
+
+
+            {e.sip_info.body!=""?<div style={{marginTop:"30px",marginBottom:"30px",display:"flex",flexDirection:"column", overflow:"", justifyContent:"start", alignItems:"start"}}>
+                <div style={{marginLeft:"30px", color:"red", fontWeight:"bold"}}>Request-Body:  </div>
+                    {e.sip_info.body.split('\r\n').map((e)=><div style={{marginLeft:"30px"}}>{e.trim()}</div>)}
+            </div>:
+                <div></div>}
+        </List>} >
+
+      </Collapse>
+    </div>
+
+    )}
+                        </List>
+
                     </div>
-                })}
-            </div>:<div></div>}
+                </div>
+            :<div></div>}
 
 
 

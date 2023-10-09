@@ -9,8 +9,8 @@ import {GraphPage} from "./pages/GraphPage";
 function App() {
   return (
 
-     <div className="App">
-         <header><img style={{display: "flex",flexDirection:"row",justifyContent:"space-between", alignItems:"center", justifyItems:"center"}} src={"https://i.ibb.co/vZXCBxn/368558567-236796635999343-3212075310249196059-n.png"} width={"100px"} height={"50px"}/><div style={{display: "inline", fontSize:"48px"}}>Packet Analyzer</div></header>
+     <div className="App" >
+         <header style={{display: "flex",flexDirection:"row",justifyContent:"space-between", alignItems:"center", justifyItems:"center", height:"82px", backgroundColor:"black"}}><img  src={"https://i.ibb.co/vZXCBxn/368558567-236796635999343-3212075310249196059-n.png"} width={"200px"} height={"100%"}/><div style={{height:"48px" ,display: "inline", fontSize:"48px",color:"white", marginTop:"-28px"}}>Packet Analyzer</div><div style={{width:"240px"}}></div></header>
      <br/><br/><br/><br/>
 
       <Routes>

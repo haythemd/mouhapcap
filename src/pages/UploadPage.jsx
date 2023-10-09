@@ -76,7 +76,7 @@ export const UploadPage = () => {
                     File Upload
                 </h3>
                 <div>
-                    <input style={{marginRight:"20px"}} type="file" onChange={onFileChange} />
+                    <input style={{marginRight:"20px"}} type="file" onChange={onFileChange} accept={".pcap"} />
                     <button onClick={onFileUpload}>
                         Upload!
                     </button>

@@ -54,13 +54,11 @@ export const UploadPage = () => {
         );
 
         // Details of the uploaded file
-        console.log(selectedFile);
 
         // Request made to the backend api
         // Send formData object
 
         const data = await axios.post("http://localhost:8000/api/upload/", formData).then(async (data) => {
-
 
             navigate("/analyze",{state:data.data});
 

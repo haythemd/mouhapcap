@@ -18,7 +18,6 @@ export const AnalyzePage = () => {
     const list = state.map((e)=>false)
     const [buttonsMap, setButtonsMap] = useState(list);
 
-console.log(state)
     const [open, setOpen] = useState(true);
     const [source, setSource] = useState("");
     const [destination, setDestination] = useState("");
@@ -44,28 +43,26 @@ console.log(state)
       if (destination ===""){
 
 
-          const list = packetsList.filter((e) => e.sip_info.from.includes(source));
+          const list = packetsList.filter((e) => (e.sip_info.from != null)?e.sip_info.from.includes(source):false);
           setPacketsList(list);
 
       }
       else if (source ===""){
 
-           const list = packetsList.filter((e) => e.sip_info.to.includes(destination));
+           const list = packetsList.filter((e) => (e.sip_info.to != null)?e.sip_info.to.includes(destination):false);
            setPacketsList(list);
 
       }
       else{
 
 
-          const list = packetsList.filter((e) => e.sip_info.from.includes(source) && e.sip_info.to.includes(destination));
+          const list = packetsList.filter((e) => ((e.sip_info.from != null)?e.sip_info.from.includes(source):false) && ((e.sip_info.to != null)?e.sip_info.to.includes(destination):false));
           setPacketsList(list);
 
       }
 
 
-    console.log(packetsList)
-  console.log(source);
-      console.log(destination)
+
     }
 
 
@@ -86,7 +83,6 @@ const handleNav = ()=>{
         list[i]=true;
         setButtonsMap(list);
         setOpen(!open)
-        console.log(buttonsMap)
   };
 
     return (
@@ -117,15 +113,15 @@ const handleNav = ()=>{
 >
 
     {packetsList.map((e, index)=><div><ListItemButton dense={true} key={index} divider={true} sx={{display:"flex",flexDirection:"row",justifyContent:"space-evenly"}} style={{display:"flex",flexDirection:"row",justifyContent:"space-evenly"}} onClick={()=>handleClick(index)}>
-        <ListItemText >{index}</ListItemText>
-     <ListItemText>{dayjs.unix(e.sip_info.time).format('DD/MM/YYYY HH:mm:ss')}</ListItemText>
-        <ListItemText>{e.sip_info.src_ip.trim()}</ListItemText>
-      <ListItemText>{e.sip_info.dst_ip.trim()}</ListItemText>
+        <ListItemText style={{overflow:"clip"}} >{index}</ListItemText>
+     <ListItemText style={{overflow:"clip"}}>{dayjs.unix(e.sip_info.time).format('DD/MM/YYYY HH:mm:ss')}</ListItemText>
+        <ListItemText style={{overflow:"clip"}}>{e.sip_info.src_ip.trim()}</ListItemText>
+      <ListItemText style={{overflow:"clip"}}>{e.sip_info.dst_ip.trim()}</ListItemText>
          <ListItemText>SIP/SDP</ListItemText>
-          <ListItemText>{e.sip_info.body.length}</ListItemText>
+          <ListItemText>{( e.sip_info.body != null)?e.sip_info.body.length:"NaN"}</ListItemText>
                   <ListItemText>seq_number</ListItemText>
 
-         <ListItemText>{e.sip_info.summary.split(",")[0]}</ListItemText>
+         <ListItemText>{(typeof e.sip_info.summary === 'string')?e.sip_info.summary.split(",")[0]:"NaN"}</ListItemText>
 
          {buttonsMap[index] && open ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
@@ -133,17 +129,17 @@ const handleNav = ()=>{
 
         <List component="div" disablePadding style={{backgroundColor:"white"}}>
         <div style={{marginTop:"30px",marginBottom:"30px",display:"flex",flexDirection:"row"}}>
-            <div style={{marginLeft:"30px"}}>Request-Line:  </div>{e.sip_info.summary.split(',').map((e)=><div style={{marginLeft:"30px"}}>{e}</div>)}
+            <div style={{marginLeft:"30px"}}>Request-Line:  </div>{(typeof e.sip_info.summary === 'string')?e.sip_info.summary.split(',').map((e)=><div style={{marginLeft:"30px"}}>{e}</div>):"empty"}
         </div>
 
             <div style={{marginTop:"30px",marginBottom:"30px",display:"flex",flexDirection:"column", overflow:"", justifyContent:"start", alignItems:"start"}}>
-                <div style={{marginLeft:"30px", marginBottom:"20px"}}>Message-Header:  </div>{e.sip_info.headers.split('\r\n').map((e)=><div style={{marginLeft:"30px"}}>{e.trim()}</div>)}
+                <div style={{marginLeft:"30px", marginBottom:"20px"}}>Message-Header:  </div>{(typeof e.sip_info.headers === 'string')?e.sip_info.headers.split('\r\n').map((e)=><div style={{marginLeft:"30px"}}>{e.trim()}</div>):"empty"}
             </div>
 
 
             {e.sip_info.body!=""?<div style={{marginTop:"30px",marginBottom:"30px",display:"flex",flexDirection:"column", overflow:"", justifyContent:"start", alignItems:"start"}}>
                 <div style={{marginLeft:"30px"}}>Request-Body:  </div>
-                    {e.sip_info.body.split('\r\n').map((e)=><div style={{marginLeft:"30px"}}>{e.trim()}</div>)}
+                    {(typeof e.sip_info.body === 'string')?e.sip_info.body.split('\r\n').map((e)=><div style={{marginLeft:"30px"}}>{e.trim()}</div>):"empty"}
             </div>:
                 <div></div>}
         </List>} >
